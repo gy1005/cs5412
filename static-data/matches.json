@@ -1,0 +1,29 @@
+{
+    "0":{
+        "id": 0,
+        "homeId": 0,
+        "visitId": 7,
+        "startTime": 24,
+        "endTime": "TBD",
+        "name": "Conference Semifinals, Game 3: Celtics vs 76ers"
+    },
+
+    "1":{
+        "id": 1,
+        "homeId": 25,
+        "visitId": 7,
+        "startTime": 24,
+        "endTime": "TBD",
+        "name": "East Conference Finals, Game 1: Cavaliers vs Celtics"
+    },
+
+    "2":{
+        "id": 2,
+        "homeId": 11,
+        "visitId": 5,
+        "startTime": 24,
+        "endTime": "TBD",
+        "name": "West Conference Finals, Game 1: Warriors vs Rockets"
+    }
+
+}

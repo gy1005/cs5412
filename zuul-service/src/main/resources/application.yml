@@ -1,0 +1,35 @@
+info:
+  component: Gateway Server
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://eureka-service:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+
+
+zuul:
+  routes:
+    tweet-service:
+      path: /tweet/**
+      url: http://tweet-service:8080
+
+    sentiment-service:
+      path: /sentiment/**
+      url: http://sentiment-service:8080
+
+    hotspot-service:
+      path: /hotspot/**
+      url: http://hotspot-service:8080
+
+spring:
+  application:
+    name: zuul-service
+

@@ -1,0 +1,279 @@
+version: '3'
+services:
+  sentiment-mongodb-primary:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: primary
+    ports:
+      - 20001:27017
+    command: mongod --smallfiles --replSet sentiment-rs
+
+
+  sentiment-mongodb-secondary-0:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20002:27017
+    command: mongod --smallfiles --replSet sentiment-rs 
+ 
+
+  sentiment-mongodb-secondary-1:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20003:27017
+    command: mongod --smallfiles --replSet sentiment-rs 
+
+
+  sentiment-rs-setup:
+    image: mongo
+    restart: on-failure
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - sentiment-mongodb-primary
+      - sentiment-mongodb-secondary-0
+      - sentiment-mongodb-secondary-1
+    command: 
+      - /scripts/sentiment-mongo-setup.sh
+
+
+  tweet-mongodb-primary:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: primary
+    ports:
+      - 20004:27017
+    command: mongod --smallfiles --replSet tweet-rs
+
+
+  tweet-mongodb-secondary-0:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20005:27017
+    command: mongod --smallfiles --replSet tweet-rs 
+ 
+
+  tweet-mongodb-secondary-1:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20006:27017
+    command: mongod --smallfiles --replSet tweet-rs 
+
+
+  tweet-rs-setup:
+    image: mongo
+    restart: on-failure
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - tweet-mongodb-primary
+      - tweet-mongodb-secondary-0
+      - tweet-mongodb-secondary-1
+    privileged: true
+    command: 
+      - /scripts/tweet-mongo-setup.sh
+
+  sentiment-redis:
+    image: redis
+    restart: always
+    ports:
+      - 20007:6379
+
+  tweet-redis:
+    image: redis
+    restart: always
+    ports:
+      - 20008:6379
+
+  eureka-service:
+    image: yg397/eureka-service
+    restart: always
+    ports:
+      - 20009:8761
+
+  zuul-service:
+    image: yg397/zuul-service
+    restart: always
+    depends_on:
+      - eureka-service
+    ports:
+      - 20010:8080
+
+  sentiment-service:
+    image: yg397/sentiment-service
+    restart: always
+    depends_on:
+      - eureka-service
+      - zuul-service
+      - sentiment-rs-setup
+      - sentiment-redis
+
+    ports:
+      - 20011:8080
+
+  tweet-service:
+    image: yg397/tweet-service
+    restart: always
+    depends_on:
+      - eureka-service
+      - zuul-service
+      - tweet-rs-setup
+      - tweet-redis
+    ports:
+      - 20012:8080
+
+ rabbitmq-0:
+    image: rabbitmq
+    restart: always
+    ports:
+      - 20020:5672
+    hostname: rabbitmq-0
+    environment:
+      - RABBITMQ_ERLANG_COOKIE="abcdefg"
+
+  rabbitmq-1:
+    image: rabbitmq
+    restart: always
+    hostname: rabbitmq-1
+    ports:
+      - 20021:5672
+    environment:
+     - RABBITMQ_ERLANG_COOKIE="abcdefg"
+
+  rabbitmq-2:
+    image: rabbitmq
+    restart: always
+    ports:
+      - 20022:5672
+    hostname: rabbitmq-2
+    environment:
+      - RABBITMQ_ERLANG_COOKIE="abcdefg"
+
+  rabbitmq-cluster-setup:
+    image: rabbitmq
+    restart: on-failure
+    volumes:
+      - ./scripts:/scripts    
+    depends_on:
+      - rabbitmq-0
+      - rabbitmq-1
+      - rabbitmq-2
+    privileged: true
+    environment:
+      - RABBITMQ_ERLANG_COOKIE="abcdefg"
+    command: 
+      - /scripts/rabbitmq-setup.sh
+
+
+
+
+
+
+  hotspot-mongodb-primary:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: primary
+    ports:
+      - 20014:27017
+    command: mongod --smallfiles --replSet hotspot-rs
+
+
+  hotspot-mongodb-secondary-0:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20015:27017
+    command: mongod --smallfiles --replSet hotspot-rs 
+ 
+
+  hotspot-mongodb-secondary-1:
+    image: mongo
+    restart: always
+    environment: 
+      MONGO_ROLE: secondary
+    ports:
+      - 20016:27017
+    command: mongod --smallfiles --replSet hotspot-rs 
+
+
+  hotspot-rs-setup:
+    image: mongo
+    restart: on-failure
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - hotspot-mongodb-primary
+      - hotspot-mongodb-secondary-0
+      - hotspot-mongodb-secondary-1
+    command: 
+      - /scripts/hotspot-mongo-setup.sh
+
+  hotspot-redis:
+    image: redis
+    restart: always
+    ports:
+      - 20018:6379
+
+
+  hotspot-service:
+    image: yg397/hotspot-service
+    restart: always
+    depends_on:
+      - eureka-service
+      - zuul-service
+      - hotspot-rs-setup
+      - hotspot-redis
+    ports:
+      - 20019:8080
+
+
+  
+
+
+
+  # tweet-streaming-publisher:
+  #   image: yg397/tweet-streaming-publisher
+  #   restart: always
+  #   depends_on:
+  #     - rabbitmq
+      # - tweet-service
+      # - sentiment-service
+
+
+  # tweet-streaming-subscriber:
+  #   image: yg397/tweet-streaming-subscriber
+  #   restart: always
+  #   depends_on:
+  #     - rabbitmq
+  #     # - tweet-service
+  #     # - sentiment-service
+  #     # - tweet-streaming-publisher
+  #   # command: "./scripts/wait-for-it.sh -h rabbitmq -p 5672 -- python3 /data/tweet-streaming-subscriber.py"
+
+  
+    
+
+  
+
+
+       
+
+
+
+

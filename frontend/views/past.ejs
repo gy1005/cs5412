@@ -1,0 +1,71 @@
+<% include partials/header %>
+
+
+<div class = "container">
+  <p><a href = "/"> Back to Main Page </a></p>
+    <h1><center>Match Sentiment From Twitter</center></h1>
+
+    <div id="curve_chart" style="width: 1200px; height: 500px"></div>   
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Time');
+            data.addColumn('number', 'Cleveland');
+            data.addColumn({type:'string',role:'annotation'});
+            data.addColumn({type:'string',role:'annotationText'});
+            data.addColumn('number', 'Celtics');
+            data.addColumn({type:'string',role:'annotation'});
+            data.addColumn({type:'string',role:'annotationText'});
+
+
+            <% var len = Math.min(tweets[0].length-1, tweets[1].length-1) %>;
+            
+            <% for(var i = 0; i< len; i++){ %>
+                <% var time = new Date(tweets[0][i]["timestamp"]) %>
+                <% var hours = time.getHours() %>
+                <% var minutes = '0'+time.getMinutes() %>
+                <% var formattedtime = hours+':'+minutes.substr(-2) %>
+
+                
+                <% var team1sentiment =   tweets[0][i]["polarity"]%>
+                <% var team2sentiment =   tweets[1][i]["polarity"]%>
+                <% if(team1sentiment>0){ %>
+                        <%var team1text = " " %>
+                <% }else{ %>
+                        <%var team1text = " " %>                    
+                <% } %>
+
+                <% if(team2sentiment>0){ %>
+                    <%var team2text = " " %>
+                <% }else{ %>
+                    <%var team2text = " " %>
+                <% } %>
+               
+                data.addRows([['<%= formattedtime %>',<%= team1sentiment %>, '','<%= team1text%>',<%= team2sentiment %>, '','<%= team2text%>']]);
+            <% } %>
+            
+          
+
+
+        var options = {
+          //title: 'Fans Sentiment',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
+    <p><a href = "/hotspot"> Current Hot Spot </a></p>
+
+</div>
+
+<% include partials/footer %>

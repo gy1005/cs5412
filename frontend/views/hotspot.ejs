@@ -1,0 +1,28 @@
+<% include partials/header %>
+<div class = "container width:200px">
+    <h1>Current Hot Spot</h1>
+    
+    <p><a href = "/"> Back to Main Page </a></p>
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">Hotspot table</div>
+  <table class="table">
+  <tr>
+    <th>Hot Spot</th>
+    <th>Frequency</th> 
+  </tr>
+    <% tweets['keywords'].forEach(function(tweet){ %>
+    <tr>
+        <td><%= tweet['text'] %></td>
+        <td><%= tweet['freq'].toFixed(2) %></td>
+    <tr>
+    <% }) %>
+  </table>
+</div>
+    <% include partials/footer %>
+    
+</div>
+
+

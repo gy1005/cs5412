@@ -1,0 +1,25 @@
+<% include partials/header %>
+<div class = "container">
+    <h1>Search results</h1>
+    
+    <p><a href = "/"> Back to Main Page </a></p>
+    <!--parse json and display keyword, username and text-->
+    <h4>"Keyword: <%= keyword %>"</h4>
+
+    <% tweets.forEach(function(tweet){ %>
+        <div class = "row">
+            <div class = "col-xs-1">
+               <h5><%= tweet.userName %>:</h5> 
+            </div>
+            <div class = "col-xs-7">
+               <h6><%= tweet.text %></h6> 
+            </div>
+        </div>
+        
+    <% }) %>
+    
+    <% include partials/footer %>
+    
+</div>
+
+
