@@ -135,7 +135,7 @@ services:
     ports:
       - 20012:8080
 
- rabbitmq-0:
+  rabbitmq-0:
     image: rabbitmq
     restart: always
     ports:
